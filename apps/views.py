@@ -58,30 +58,23 @@ class RunApp(generics.RetrieveAPIView):
     print(data)
     # todo: labels...
     name = data['name']
-    image = data['image']
-    # image = 'hub.hamdocker.ir/nginx:1.21'
+    # image = data['image']
+    image = 'hub.hamdocker.ir/nginx:1.21'
     envs = data['envs']
     command = data['command'].split()
-    try:
-        client = docker.from_env()
-        container = client.containers.run(image, command, detach=True)
-        # add time
-        q = Run(app_name=name, image=image, envs=envs, status='running', time="nine")
-        q.save()
-        # container = client.containers.list(all=True)
-        print(container)
-        '''
-        for i in container:
-            # print(i.id, i.name, i.image, i.status)
-            print(i.logs(timestamps=True))
-        '''
-    except docker.errors.ContainerError: 
-        print("Can't run this container")
-    except docker.errors.ImageNotFound: 
-        print("Image not found")
-    except docker.errors.APIError:
-        print("API error")
 
+    client = docker.from_env()
+    container = client.containers.run(image, command, detach=True)
+    # add time
+    q = Run(app_name=name, image=image, envs=envs, status='running', time="")
+    q.save()
+
+    '''
+    container = client.containers.list(all=True)
+    for i in container:
+        # print(i.id, i.name, i.image, i.status)
+        print(i.logs(timestamps=True))
+    '''
 
 class GetApp():
     queryset = models.App.objects.all()
