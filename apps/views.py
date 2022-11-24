@@ -6,8 +6,7 @@ from rest_framework.response import Response
 
 from appmanager import models
 from .serializers import AppSerializer
-
-from subprocess import call
+import docker
 
 
 def home_view(request, *args, **kwargs):
@@ -55,11 +54,15 @@ class RunApp(generics.RetrieveAPIView):
     queryset = models.App.objects.all()
     get_serializer = AppSerializer
     data = models.App.objects.all().values()[0]
-    print("===")
     print(data)
-    command = f"docker run {data['image']} {data['command']}"
+    # command = f"docker run {data['image']} {data['command']}"
+    command = data['command'].split()
     # add if envs is not empty...
     # command = f"docker run -e {data[]} {data['command']}"
+    client = docker.from_env()
+    # todo: add values
+    container = client.containers.run(data['image'], command, detach=True)
+    print(container.id)
 
 
 class RunAppList():
