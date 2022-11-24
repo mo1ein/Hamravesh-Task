@@ -2,7 +2,7 @@
 # appmanager/serializers.py
 
 from rest_framework import serializers
-from appmanger import models
+from appmanager import models
 
 
 class RunSerializer(serializers.ModelSerializer):
