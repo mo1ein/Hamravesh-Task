@@ -1,3 +1,16 @@
+# appmanager/views.py
 from django.shortcuts import render
+from rest_framework import generics
+from rest_framework.response import Response
 
-# Create your views here.
+from appmanager import models
+
+
+class CreateRun(generics.CreateAPIView):
+    queryset = models.Run.objects.all()
+    serializer_class = RunSerializer
+
+class RunList(generics.ListAPIView):
+    queryset = models.Run.objects.all()
+    serializer_class = RunSerializer
+
