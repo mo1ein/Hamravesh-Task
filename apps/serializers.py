@@ -1,7 +1,7 @@
 
 # apps/serializers.py
 from rest_framework import serializers
-from appmanager import models
+from apps import models
 
 
 class AppSerializer(serializers.ModelSerializer):
