@@ -52,9 +52,9 @@ class UpdateApp(generics.RetrieveUpdateAPIView):
 class RunApp(generics.RetrieveAPIView):
     queryset = models.App.objects.all()
     serializer_class = AppSerializer
-    data = models.App.objects.all().values()[0]
+    # data = models.App.objects.all().values()[0]
     # create function
-    print(data)
+    # print(data)
     # print(data['image'])
     # command = data['command'].split()
     # add envs
