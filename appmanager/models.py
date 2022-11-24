@@ -9,7 +9,8 @@ class Run(models.Model):
     image = models.CharField(max_length=200)
     # or parameters
     envs = models.CharField(max_length=200)
-    status = models.BooleanField()
+    status = models.CharField(max_length=8)
+    # set field datetime
     time = models.CharField(max_length=200)
 
     def __str__(self):
