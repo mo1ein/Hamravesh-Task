@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from rest_framework import generics
 from .serializers import AppSerializer
 from rest_framework.response import Response
+from appmanager.models import Run
+from appmanager.serializers import RunSerializer
 
 
 def home_view(request, *args, **kwargs):
@@ -52,23 +54,33 @@ class UpdateApp(generics.RetrieveUpdateAPIView):
 class RunApp(generics.RetrieveAPIView):
     queryset = models.App.objects.all()
     serializer_class = AppSerializer
-    # data = models.App.objects.all().values()[0]
-    # create function
-    # print(data)
-    # print(data['image'])
-    # command = data['command'].split()
-    # add envs
-    client = docker.from_env()
-    # todo: add values
-    image = 'hub.hamdocker.ir/nginx:1.21'
-    command = ['sleep', '1000']
-    container = client.containers.run(image, command, detach=True)
-    # print(container.id)
-    container = client.containers.list(all=True)
-    print(container)
-    for i in container:
-        # print(i.id, i.name, i.image, i.status)
-        print(i.logs(timestamps=True))
+    data = queryset.values()[0]
+    print(data)
+    # todo: labels...
+    name = data['name']
+    image = data['image']
+    # image = 'hub.hamdocker.ir/nginx:1.21'
+    envs = data['envs']
+    command = data['command'].split()
+    try:
+        client = docker.from_env()
+        container = client.containers.run(image, command, detach=True)
+        # add time
+        q = Run(app_name=name, image=image, envs=envs, status='running', time="nine")
+        q.save()
+        # container = client.containers.list(all=True)
+        print(container)
+        '''
+        for i in container:
+            # print(i.id, i.name, i.image, i.status)
+            print(i.logs(timestamps=True))
+        '''
+    except docker.errors.ContainerError: 
+        print("Can't run this container")
+    except docker.errors.ImageNotFound: 
+        print("Image not found")
+    except docker.errors.APIError:
+        print("API error")
 
 
 class GetApp():
