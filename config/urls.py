@@ -10,5 +10,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('apps/', include('apps.urls')),
     path('create/', CreateApp.as_view()),
-    # path('run/', RunList.as_view())
+    path('run/', RunList.as_view())
 ]
