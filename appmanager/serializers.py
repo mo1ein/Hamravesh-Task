@@ -12,6 +12,6 @@ class RunSerializer(serializers.ModelSerializer):
             'image',
             'envs',
             'status',
-            'time',
+            'created_at',
         )
         model = models.Run

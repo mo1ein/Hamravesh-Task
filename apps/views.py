@@ -8,6 +8,7 @@ from .serializers import AppSerializer
 from rest_framework.response import Response
 from appmanager.models import Run
 from appmanager.serializers import RunSerializer
+import datetime
 
 
 def home_view(request, *args, **kwargs):
@@ -54,27 +55,39 @@ class UpdateApp(generics.RetrieveUpdateAPIView):
 class RunApp(generics.RetrieveAPIView):
     queryset = models.App.objects.all()
     serializer_class = AppSerializer
-    data = queryset.values()[0]
-    print(data)
-    # todo: labels...
-    name = data['name']
-    # image = data['image']
-    image = 'hub.hamdocker.ir/nginx:1.21'
-    envs = data['envs']
-    command = data['command'].split()
 
-    client = docker.from_env()
-    container = client.containers.run(image, command, detach=True)
-    # add time
-    q = Run(app_name=name, image=image, envs=envs, status='running', time="")
-    q.save()
+    def get(self, request, *args, **kwargs):
+        data = self.queryset.values()[0]
+        # todo: labels...
+        name = data['name']
+        image = data['image']
+        # image = 'hub.hamdocker.ir/nginx:1.21'
+        envs = data['envs']
+        command = data['command'].split()
 
+        # client = docker.from_env()
+        # container = client.containers.run(image, command, detach=True)
+        # todo: exception if can't run
+        status = 'running'
+
+        q = Run(
+            app_name=name,
+            image=image,
+            envs=envs,
+            status=status,
+            created_at=datetime.datetime.now(datetime.timezone.utc)
+        )
+        q.save()
+
+        run_data = {'name': name, 'image': image, 'envs': envs, status: status}
+        return Response(run_data)
     '''
     container = client.containers.list(all=True)
     for i in container:
         # print(i.id, i.name, i.image, i.status)
         print(i.logs(timestamps=True))
     '''
+
 
 class GetApp():
     queryset = models.App.objects.all()
