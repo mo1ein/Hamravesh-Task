@@ -1,14 +1,14 @@
 # apps/views.py
 
 import docker
+import datetime
 from apps import models
-from django.http import HttpResponse
+from appmanager.models import Run
 from rest_framework import generics
+from django.http import HttpResponse
 from .serializers import AppSerializer
 from rest_framework.response import Response
-from appmanager.models import Run
 from appmanager.serializers import RunSerializer
-import datetime
 
 
 def home_view(request, *args, **kwargs):
@@ -59,29 +59,37 @@ class RunApp(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         data = self.queryset.values()[0]
         # todo: labels...
-        name = data['name']
+        app = data['name']
         image = data['image']
         # image = 'hub.hamdocker.ir/nginx:1.21'
         envs = data['envs']
         command = data['command'].split()
 
-        # client = docker.from_env()
-        # container = client.containers.run(image, command, detach=True)
-        # todo: exception if can't run
-        status = 'running'
+        client = docker.from_env()
+        container = client.containers.run(image, command, detach=True)
+        if container is not None:
+            container_name = container.name
+            status = 'running'
 
-        q = Run(
-            app_name=name,
-            image=image,
-            container_name = "moein joon",
-            envs=envs,
-            status=status,
-            created_at=datetime.datetime.now(datetime.timezone.utc)
-        )
-        q.save()
+            q = Run(
+                app_name=app,
+                image=image,
+                container_name=container_name,
+                envs=envs,
+                status=status,
+                created_at=datetime.datetime.now(datetime.timezone.utc)
+            )
+            q.save()
 
-        run_data = {'name': name, 'image': image, 'envs': envs, status: status}
-        return Response(run_data)
+            run_data = {
+                'name': app,
+                'image': image,
+                'container_name': container_name,
+                'envs': envs,
+                'status': status
+            }
+            return Response(run_data)
+        return Response({"message": "failed to run container", "details": docker.errors})
 
 
 class GetApp():
