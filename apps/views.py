@@ -73,6 +73,7 @@ class RunApp(generics.RetrieveAPIView):
         q = Run(
             app_name=name,
             image=image,
+            container_name = "moein joon",
             envs=envs,
             status=status,
             created_at=datetime.datetime.now(datetime.timezone.utc)
@@ -81,12 +82,6 @@ class RunApp(generics.RetrieveAPIView):
 
         run_data = {'name': name, 'image': image, 'envs': envs, status: status}
         return Response(run_data)
-    '''
-    container = client.containers.list(all=True)
-    for i in container:
-        # print(i.id, i.name, i.image, i.status)
-        print(i.logs(timestamps=True))
-    '''
 
 
 class GetApp():

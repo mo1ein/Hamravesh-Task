@@ -10,6 +10,7 @@ class RunSerializer(serializers.ModelSerializer):
         fields = (
             'app_name',
             'image',
+            'container_name',
             'envs',
             'status',
             'created_at',
