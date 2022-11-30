@@ -9,5 +9,4 @@ urlpatterns = [
     path('<int:pk>/update', UpdateApp.as_view()),
     path('<int:pk>/delete', DeleteApp.as_view()),
     path('<int:pk>/run', RunApp.as_view()),
-    # path('<int:pk>/get', GetApp.as_view()),
 ]

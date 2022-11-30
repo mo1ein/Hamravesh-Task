@@ -7,6 +7,7 @@ from apps import models
 class AppSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
+            'id',
             'name',
             'image',
             'envs',

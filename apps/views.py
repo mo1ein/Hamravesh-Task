@@ -1,8 +1,10 @@
 # apps/views.py
 
+#!/bin/python3
+
 import docker
 import datetime
-from apps import models
+from apps.models import App
 from appmanager.models import Run
 from rest_framework import generics
 from django.http import HttpResponse
@@ -16,27 +18,27 @@ def home_view(request, *args, **kwargs):
 
 
 class AppList(generics.ListAPIView):
-    queryset = models.App.objects.all()
+    queryset = App.objects.all()
     serializer_class = AppSerializer
 
 
 class AppDetail(generics.RetrieveAPIView):
-    queryset = models.App.objects.all()
+    queryset = App.objects.all()
     serializer_class = AppSerializer
 
 
 class CreateApp(generics.CreateAPIView):
-    queryset = models.App.objects.all()
+    queryset = App.objects.all()
     serializer_class = AppSerializer
 
 
 class DeleteApp(generics.RetrieveDestroyAPIView):
-    queryset = models.App.objects.all()
+    queryset = App.objects.all()
     serializer_class = AppSerializer
 
 
 class UpdateApp(generics.RetrieveUpdateAPIView):
-    queryset = models.App.objects.all()
+    queryset = App.objects.all()
     serializer_class = AppSerializer
 
     def update(self, request, *args, **kwargs):
@@ -53,45 +55,39 @@ class UpdateApp(generics.RetrieveUpdateAPIView):
 
 
 class RunApp(generics.RetrieveAPIView):
-    queryset = models.App.objects.all()
+    queryset = App.objects.all()
     serializer_class = AppSerializer
 
     def get(self, request, *args, **kwargs):
         data = self.queryset.values()[0]
-        # todo: labels...
         app = data['name']
         image = data['image']
-        # image = 'hub.hamdocker.ir/nginx:1.21'
         envs = data['envs']
         command = data['command'].split()
-
         client = docker.from_env()
-        container = client.containers.run(image, command, detach=True)
-        if container is not None:
+        try:
+            container = client.containers.run(image, command, detach=True)
             container_name = container.name
             status = 'running'
-
+            
             q = Run(
-                app_name=app,
-                image=image,
-                container_name=container_name,
-                envs=envs,
-                status=status,
-                created_at=datetime.datetime.now(datetime.timezone.utc)
+                    app_name=app,
+                    image=image,
+                    container_name=container_name,
+                    envs=envs,
+                    status=status,
+                    created_at=datetime.datetime.now(datetime.timezone.utc)
             )
             q.save()
 
             run_data = {
-                'name': app,
-                'image': image,
-                'container_name': container_name,
-                'envs': envs,
-                'status': status
+                    'name': app,
+                    'image': image,
+                    'container_name': container_name,
+                    'envs': envs,
+                    'status': status
             }
+
             return Response(run_data)
-        return Response({"message": "failed to run container", "details": docker.errors})
-
-
-class GetApp():
-    queryset = models.App.objects.all()
-    serializer_class = AppSerializer
+        except:
+            return Response({"message": "faild to run container"})
