@@ -6,18 +6,19 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.response import Response
 from .serializers import RunSerializer
-from appmanager import models
+from appmanager.models import Run
 
 
 class CreateRun(generics.CreateAPIView):
-    queryset = models.Run.objects.all()
+    queryset = Run.objects.all()
     serializer_class = RunSerializer
 
 
 class RunList(generics.ListAPIView):
-    queryset = models.Run.objects.all()
+    queryset = Run.objects.all()
     serializer_class = RunSerializer
 
+    # check containers are running? or finished?
     def get(self, request, *args, **kwargs):
         runs = self.queryset.values()
         client = docker.from_env()
@@ -27,8 +28,15 @@ class RunList(generics.ListAPIView):
             if run['container_name'] not in container_names:
                 data = run
                 data['status'] = 'finished'
-                pk = request.data[run['container_name']]
-                instance = models.Run.objects.get(pk=pk)
-                q = models.Run(instance, data=data)
-                q.save()
-        return Response(data)
+                pk = run['id']
+                instance = Run.objects.get(pk=pk)
+                serializer = self.serializer_class(
+                    instance, 
+                    data=data,
+                    partial=True
+                )
+                if serializer.is_valid():
+                    serializer.save()
+        queryset = self.get_queryset()
+        serializer = RunSerializer(queryset, many=True)
+        return Response(serializer.data)
