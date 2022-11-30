@@ -14,45 +14,44 @@ python manage.py runserver
 ```
 
 ## Endpoints
-
 Create app
 
 ```
-localhost:8000/create/
+<IP>:<PORT>/create/
 ```
 
 List of apps
 
 ```
-localhost:8000/apps
+<IP>:<PORT>/apps/
 ```
 
 Detail of app
 
 ```
-localhost:8000/apps/ID/
+<IP>:<PORT>/apps/ID/
 ```
 
 Update app
 
 ```
-localhost:8000/apps/ID/update
+<IP>:<PORT>/apps/ID/update
 ```
 
 Delete app
 
 ```
-localhost:8000/apps/ID/delete
+<IP>:<PORT>/apps/ID/delete
 ```
 
 Run app
 
 ```
-localhost:8000/apps/ID/run
+<IP>:<PORT>/apps/ID/run
 ```
 
 List of runs
 
 ```
-localhost:8000/run/
+<IP>:<PORT>/run/
 ```

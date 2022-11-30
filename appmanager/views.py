@@ -2,16 +2,11 @@
 # appmanager/views.py
 
 import docker
+from appmanager.models import Run
 from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.response import Response
 from .serializers import RunSerializer
-from appmanager.models import Run
-
-
-class CreateRun(generics.CreateAPIView):
-    queryset = Run.objects.all()
-    serializer_class = RunSerializer
+from rest_framework.response import Response
 
 
 class RunList(generics.ListAPIView):
@@ -31,7 +26,7 @@ class RunList(generics.ListAPIView):
                 pk = run['id']
                 instance = Run.objects.get(pk=pk)
                 serializer = self.serializer_class(
-                    instance, 
+                    instance,
                     data=data,
                     partial=True
                 )
