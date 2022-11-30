@@ -1,6 +1,5 @@
-# apps/views.py
 
-#!/bin/python3
+# apps/views.py
 
 import docker
 import datetime
@@ -14,7 +13,7 @@ from appmanager.serializers import RunSerializer
 
 
 def home_view(request, *args, **kwargs):
-    return HttpResponse("<center><h1>HamRaveshTask</h1></center>")
+    return HttpResponse("<center><h1>HamRavesh Task</h1></center>")
 
 
 class AppList(generics.ListAPIView):
@@ -48,7 +47,6 @@ class UpdateApp(generics.RetrieveUpdateAPIView):
             instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            # self.perform_update(serializer)
         else:
             return Response({"message": "failed", "details": serializer.errors})
         return Response(serializer.data)
@@ -69,25 +67,24 @@ class RunApp(generics.RetrieveAPIView):
             container = client.containers.run(image, command, detach=True)
             container_name = container.name
             status = 'running'
-            
+
             q = Run(
-                    app_name=app,
-                    image=image,
-                    container_name=container_name,
-                    envs=envs,
-                    status=status,
-                    created_at=datetime.datetime.now(datetime.timezone.utc)
+                app_name=app,
+                image=image,
+                container_name=container_name,
+                envs=envs,
+                status=status,
+                created_at=datetime.datetime.now(datetime.timezone.utc)
             )
             q.save()
 
             run_data = {
-                    'name': app,
-                    'image': image,
-                    'container_name': container_name,
-                    'envs': envs,
-                    'status': status
+                'name': app,
+                'image': image,
+                'container_name': container_name,
+                'envs': envs,
+                'status': status
             }
-
             return Response(run_data)
         except:
             return Response({"message": "faild to run container"})
